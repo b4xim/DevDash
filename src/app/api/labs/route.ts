@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { logActivity } from '@/lib/activity';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -67,6 +68,10 @@ export async function PATCH(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (updates.status === 'done' || updates.status === 'in_progress') {
+    await logActivity();
   }
 
   return NextResponse.json(data);

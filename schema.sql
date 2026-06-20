@@ -44,3 +44,20 @@ CREATE TABLE job_applications (
 -- Disable Row Level Security (Since we handle auth via Next.js middleware)
 ALTER TABLE labs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE job_applications DISABLE ROW LEVEL SECURITY;
+
+-- Activity Log table
+CREATE TABLE activity_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  log_date DATE UNIQUE NOT NULL,
+  count INTEGER NOT NULL DEFAULT 1
+);
+ALTER TABLE activity_log DISABLE ROW LEVEL SECURITY;
+
+-- Daily Focus table
+CREATE TABLE daily_focus (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  focus_date DATE UNIQUE NOT NULL,
+  suggestion TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE daily_focus DISABLE ROW LEVEL SECURITY;

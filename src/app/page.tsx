@@ -3,8 +3,9 @@ export const dynamic = 'force-dynamic';
 import { supabase } from '@/lib/supabase';
 import ProgressBar from '@/components/ProgressBar';
 import DashboardCharts from '@/components/DashboardCharts';
+import StreakCalendar from '@/components/StreakCalendar';
 
-import type { Lab, JobApplication, ApplicationStatus } from '@/lib/supabase';
+import type { Lab, JobApplication, ApplicationStatus, ActivityLog } from '@/lib/supabase';
 
 const CATEGORIES = ['linux', 'docker', 'kubernetes', 'aws', 'terraform', 'ci-cd', 'ansible'];
 
@@ -27,13 +28,15 @@ const JOB_STATUS_META: Record<ApplicationStatus, { label: string; color: string;
 
 export default async function DashboardPage() {
   // Fetch data server-side
-  const [labsResult, jobsResult] = await Promise.all([
+  const [labsResult, jobsResult, activityResult] = await Promise.all([
     supabase.from('labs').select('*'),
     supabase.from('job_applications').select('*'),
+    supabase.from('activity_log').select('*'),
   ]);
 
   const labs: Lab[] = labsResult.data ?? [];
   const jobs: JobApplication[] = jobsResult.data ?? [];
+  const activityLogs: ActivityLog[] = activityResult.data ?? [];
 
   // Compute per-category stats
   const categoryStats = CATEGORIES.map((cat) => {
@@ -100,6 +103,9 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Activity Streak */}
+      <StreakCalendar logs={activityLogs} />
 
       {/* Charts */}
       <div style={{ marginBottom: '24px' }}>

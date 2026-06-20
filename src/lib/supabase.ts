@@ -38,3 +38,16 @@ export interface JobApplication {
   notes: string | null;
   created_at: string;
 }
+
+export interface ActivityLog {
+  id: string;
+  log_date: string;
+  count: number;
+}
+
+export interface DailyFocus {
+  id: string;
+  focus_date: string;
+  suggestion: string;
+  created_at: string;
+}
