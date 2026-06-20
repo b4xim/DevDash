@@ -40,3 +40,7 @@ CREATE TABLE job_applications (
 --   ('terraform', 'Write a basic plan'),
 --   ('ci-cd', 'GitHub Actions workflow'),
 --   ('ansible', 'Write a playbook');
+
+-- Disable Row Level Security (Since we handle auth via Next.js middleware)
+ALTER TABLE labs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE job_applications DISABLE ROW LEVEL SECURITY;

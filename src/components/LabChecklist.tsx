@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
 import ProgressBar from './ProgressBar';
 import type { Lab, LabStatus } from '@/lib/supabase';
 
@@ -36,6 +37,10 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
   const [adding, setAdding] = useState(false);
   const [aiAdding, setAiAdding] = useState(false);
   const [aiError, setAiError] = useState('');
+  
+  // Explain Mode state
+  const [explainingId, setExplainingId] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<{ labName: string; text: string } | null>(null);
 
   const fetchLabs = useCallback(async () => {
     setLoading(true);
@@ -141,6 +146,27 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
     }
   };
 
+  const handleExplain = async (lab: Lab) => {
+    setExplainingId(lab.id);
+    try {
+      const res = await fetch('/api/explain-lab', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: slug, labName: lab.name }),
+      });
+      const data = await res.json();
+      if (res.ok && data.explanation) {
+        setExplanation({ labName: lab.name, text: data.explanation });
+      } else {
+        alert(data.error || 'Failed to explain');
+      }
+    } catch (err) {
+      alert('Error fetching explanation');
+    } finally {
+      setExplainingId(null);
+    }
+  };
+
   const total = labs.length;
   const done = labs.filter((l) => l.status === 'done').length;
   const percentage = total > 0 ? (done / total) * 100 : 0;
@@ -218,6 +244,20 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
                 {STATUS_LABEL[lab.status]}
               </span>
 
+              {/* Explain */}
+              <button
+                onClick={() => handleExplain(lab)}
+                disabled={explainingId === lab.id}
+                style={{
+                  background: 'transparent', border: 'none', cursor: 'pointer',
+                  color: explainingId === lab.id ? 'var(--text-muted)' : 'var(--info)', 
+                  fontSize: '0.8rem', padding: '4px',
+                  fontWeight: 500,
+                }}
+              >
+                {explainingId === lab.id ? 'Thinking…' : 'Explain'}
+              </button>
+
               {/* Delete */}
               <button
                 onClick={() => deleteLab(lab.id)}
@@ -284,8 +324,30 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
         )}
       </div>
 
+      {/* Explain Modal */}
+      {explanation && (
+        <div className="modal-overlay" onClick={() => setExplanation(null)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '650px', maxHeight: '85vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>{explanation.labName}</h2>
+              <button onClick={() => setExplanation(null)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+            </div>
+            <div className="markdown-content" style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
+              <ReactMarkdown>{explanation.text}</ReactMarkdown>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .lab-row:hover .delete-btn { opacity: 1 !important; }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { margin-top: 1.5em; margin-bottom: 0.5em; color: var(--text-primary); }
+        .markdown-content p { margin-bottom: 1em; color: var(--text-secondary); }
+        .markdown-content pre { background: var(--bg-elevated); padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 1em; border: 1px solid var(--border); }
+        .markdown-content code { background: var(--bg-elevated); padding: 2px 4px; border-radius: 4px; font-size: 0.85em; color: var(--accent); }
+        .markdown-content pre code { background: transparent; padding: 0; color: inherit; }
+        .markdown-content ul, .markdown-content ol { padding-left: 20px; margin-bottom: 1em; color: var(--text-secondary); }
+        .markdown-content li { margin-bottom: 0.25em; }
       `}</style>
     </div>
   );

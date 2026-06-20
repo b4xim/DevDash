@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { supabase } from '@/lib/supabase';
 import ProgressBar from '@/components/ProgressBar';
 import DashboardCharts from '@/components/DashboardCharts';
+import StandupGenerator from '@/components/StandupGenerator';
 import type { Lab, JobApplication, ApplicationStatus } from '@/lib/supabase';
 
 const CATEGORIES = ['linux', 'docker', 'kubernetes', 'aws', 'terraform', 'ci-cd', 'ansible'];
@@ -99,6 +100,9 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Daily Standup Generator */}
+      <StandupGenerator labs={labs} />
 
       {/* Charts */}
       <div style={{ marginBottom: '24px' }}>

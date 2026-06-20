@@ -58,6 +58,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <Link
           href="/"
           className={`sidebar-link ${pathname === '/' ? 'active' : ''}`}
+          onClick={onClose}
         >
           <span>📊</span>
           <span>Dashboard</span>
@@ -70,6 +71,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             key={slug}
             href={`/tools/${slug}`}
             className={`sidebar-link ${isActive(`/tools/${slug}`) ? 'active' : ''}`}
+            onClick={onClose}
           >
             <span>{icon}</span>
             <span>{label}</span>
@@ -79,10 +81,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="sidebar-divider" style={{ marginTop: '16px' }} />
 
         {/* Other links */}
-        <div className="sidebar-section-label">Tracking</div>
+        <div className="sidebar-section-label">Workflow & Prep</div>
+        <Link
+          href="/interview"
+          className={`sidebar-link ${isActive('/interview') ? 'active' : ''}`}
+          onClick={onClose}
+        >
+          <span>🎙️</span>
+          <span>Mock Interview</span>
+        </Link>
+        <Link
+          href="/whiteboard"
+          className={`sidebar-link ${isActive('/whiteboard') ? 'active' : ''}`}
+          onClick={onClose}
+        >
+          <span>✏️</span>
+          <span>Whiteboard</span>
+        </Link>
         <Link
           href="/jobs"
           className={`sidebar-link ${isActive('/jobs') ? 'active' : ''}`}
+          onClick={onClose}
         >
           <span>💼</span>
           <span>Job Tracker</span>
@@ -90,9 +109,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <Link
           href="/news"
           className={`sidebar-link ${isActive('/news') ? 'active' : ''}`}
+          onClick={onClose}
         >
           <span>📰</span>
-          <span>Latest in DevOps</span>
+          <span>DevOps News</span>
         </Link>
       </nav>
 
