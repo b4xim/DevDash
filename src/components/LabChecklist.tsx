@@ -34,6 +34,8 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
   const [loading, setLoading] = useState(true);
   const [newLabName, setNewLabName] = useState('');
   const [adding, setAdding] = useState(false);
+  const [aiAdding, setAiAdding] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   const fetchLabs = useCallback(async () => {
     setLoading(true);
@@ -93,6 +95,39 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
       console.error('Failed to add lab', err);
     } finally {
       setAdding(false);
+    }
+  };
+
+  const suggestAndAddLab = async () => {
+    setAiAdding(true);
+    setAiError('');
+    try {
+      // 1. Ask Gemini for a lab name
+      const suggestRes = await fetch('/api/suggest-lab', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: slug,
+          existingLabs: labs.map((l) => l.name),
+        }),
+      });
+      const { labName, error: suggestError } = await suggestRes.json();
+      if (!suggestRes.ok || !labName) throw new Error(suggestError || 'No lab name returned');
+
+      // 2. Add it to Supabase
+      const addRes = await fetch('/api/labs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: slug, name: labName }),
+      });
+      const newLab = await addRes.json();
+      if (!addRes.ok) throw new Error(newLab.error || 'Failed to add lab');
+
+      setLabs((prev) => [...prev, newLab]);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setAiAdding(false);
     }
   };
 
@@ -202,23 +237,52 @@ export default function LabChecklist({ slug, onLabsChange }: LabChecklistProps) 
       </div>
 
       {/* Add new lab form */}
-      <form onSubmit={addLab} style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
-        <input
-          type="text"
-          className="input"
-          placeholder="Add a new lab (e.g. 'Docker multi-stage builds')…"
-          value={newLabName}
-          onChange={(e) => setNewLabName(e.target.value)}
-        />
+      <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <form onSubmit={addLab} style={{ display: 'flex', gap: '8px' }}>
+          <input
+            type="text"
+            className="input"
+            placeholder="Add a new lab (e.g. 'Docker multi-stage builds')…"
+            value={newLabName}
+            onChange={(e) => setNewLabName(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={adding || !newLabName.trim()}
+            style={{ flexShrink: 0 }}
+          >
+            {adding ? '…' : '+ Add'}
+          </button>
+        </form>
+
+        {/* AI Suggest Lab button */}
         <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={adding || !newLabName.trim()}
-          style={{ flexShrink: 0 }}
+          className="btn btn-ghost"
+          onClick={suggestAndAddLab}
+          disabled={aiAdding}
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            gap: '8px',
+            borderStyle: 'dashed',
+            color: aiAdding ? 'var(--text-muted)' : 'var(--accent)',
+            borderColor: aiAdding ? 'var(--border)' : 'rgba(220,38,38,0.35)',
+          }}
         >
-          {adding ? '…' : '+ Add'}
+          {aiAdding ? (
+            <><span className="spinner" style={{ width: '14px', height: '14px', borderTopColor: 'var(--accent)' }} /> Asking AI…</>
+          ) : (
+            <>✦ AI Suggest a Lab</>
+          )}
         </button>
-      </form>
+
+        {aiError && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--accent)', marginTop: '2px' }}>
+            ⚠ {aiError}
+          </p>
+        )}
+      </div>
 
       <style>{`
         .lab-row:hover .delete-btn { opacity: 1 !important; }
