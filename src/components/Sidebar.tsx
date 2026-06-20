@@ -91,14 +91,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <span>Mock Interview</span>
         </Link>
         <Link
-          href="/whiteboard"
-          className={`sidebar-link ${isActive('/whiteboard') ? 'active' : ''}`}
-          onClick={onClose}
-        >
-          <span>✏️</span>
-          <span>Whiteboard</span>
-        </Link>
-        <Link
           href="/jobs"
           className={`sidebar-link ${isActive('/jobs') ? 'active' : ''}`}
           onClick={onClose}
