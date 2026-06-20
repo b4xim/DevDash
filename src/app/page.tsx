@@ -4,8 +4,9 @@ import { supabase } from '@/lib/supabase';
 import ProgressBar from '@/components/ProgressBar';
 import DashboardCharts from '@/components/DashboardCharts';
 import StreakCalendar from '@/components/StreakCalendar';
+import DailyFocus from '@/components/DailyFocus';
 
-import type { Lab, JobApplication, ApplicationStatus, ActivityLog } from '@/lib/supabase';
+import type { Lab, JobApplication, ApplicationStatus, ActivityLog, DailyFocus as DailyFocusType } from '@/lib/supabase';
 
 const CATEGORIES = ['linux', 'docker', 'kubernetes', 'aws', 'terraform', 'ci-cd', 'ansible'];
 
@@ -27,16 +28,20 @@ const JOB_STATUS_META: Record<ApplicationStatus, { label: string; color: string;
 };
 
 export default async function DashboardPage() {
+  const todayStr = new Date().toISOString().split('T')[0];
+
   // Fetch data server-side
-  const [labsResult, jobsResult, activityResult] = await Promise.all([
+  const [labsResult, jobsResult, activityResult, focusResult] = await Promise.all([
     supabase.from('labs').select('*'),
     supabase.from('job_applications').select('*'),
     supabase.from('activity_log').select('*'),
+    supabase.from('daily_focus').select('*').eq('focus_date', todayStr).single(),
   ]);
 
   const labs: Lab[] = labsResult.data ?? [];
   const jobs: JobApplication[] = jobsResult.data ?? [];
   const activityLogs: ActivityLog[] = activityResult.data ?? [];
+  const dailyFocus: DailyFocusType | null = focusResult.data ?? null;
 
   // Compute per-category stats
   const categoryStats = CATEGORIES.map((cat) => {
@@ -106,6 +111,9 @@ export default async function DashboardPage() {
 
       {/* Activity Streak */}
       <StreakCalendar logs={activityLogs} />
+
+      {/* Today's Focus */}
+      <DailyFocus initialFocus={dailyFocus} />
 
       {/* Charts */}
       <div style={{ marginBottom: '24px' }}>
