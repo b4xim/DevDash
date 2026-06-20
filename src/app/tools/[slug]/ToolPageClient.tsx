@@ -59,7 +59,7 @@ export default function ToolPageClient({ slug }: ToolPageClientProps) {
       </div>
 
       {/* Main content: 2-col on wide screens */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
+      <div className="tools-grid">
         {/* Left: Checklist */}
         <div>
           <LabChecklist slug={slug} onLabsChange={setLabs} />

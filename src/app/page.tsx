@@ -81,12 +81,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Summary stat bar */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '14px',
-        marginBottom: '24px',
-      }}>
+      <div className="grid-cards-4" style={{ marginBottom: '24px' }}>
         {/* Overall lab progress */}
         <div className="card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent)', lineHeight: 1 }}>{overallPct}%</div>

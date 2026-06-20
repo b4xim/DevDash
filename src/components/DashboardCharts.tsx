@@ -62,7 +62,7 @@ export default function DashboardCharts({ barData, pieData }: DashboardChartsPro
   const hasPieData = pieData.some((d) => d.value > 0);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+    <div className="grid-cards-2">
       {/* Bar Chart */}
       <div className="card">
         <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '20px' }}>

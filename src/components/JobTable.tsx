@@ -128,8 +128,9 @@ export default function JobTable() {
             </button>
           </div>
         ) : (
-          <table className="data-table">
-            <thead>
+          <div className="table-responsive">
+            <table className="data-table">
+              <thead>
               <tr>
                 <th>Company</th>
                 <th>Role</th>
@@ -199,6 +200,7 @@ export default function JobTable() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

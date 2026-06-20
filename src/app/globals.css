@@ -506,3 +506,135 @@ code, pre, .font-mono {
   text-decoration: line-through;
   color: var(--text-muted);
 }
+
+/* ─── Responsive Utilities ─── */
+.grid-cards-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.grid-cards-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.mobile-header {
+  display: none;
+}
+
+.mobile-close-btn {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    height: 100vh;
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+  
+  .sidebar.open {
+    transform: translateX(260px);
+  }
+  
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 50;
+  }
+  
+  .mobile-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+
+  .mobile-close-btn {
+    display: block;
+  }
+
+  .main-content {
+    padding: 20px 16px;
+  }
+
+  .grid-cards-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-cards-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-bar {
+    flex-wrap: wrap;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-cards-4 {
+    grid-template-columns: 1fr;
+  }
+}
+

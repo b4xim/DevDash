@@ -13,15 +13,20 @@ const CATEGORIES = [
   { slug: 'ansible',    label: 'Ansible',     icon: '📋' },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       {/* Logo */}
-      <div className="sidebar-logo">
+      <div className="sidebar-logo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{
             width: '32px', height: '32px',
@@ -34,6 +39,18 @@ export default function Sidebar() {
             <div className="sidebar-logo-subtitle">DevOps Tracker</div>
           </div>
         </div>
+        {/* Mobile close button */}
+        <button 
+          className="mobile-close-btn"
+          onClick={onClose}
+          style={{ 
+            background: 'transparent', border: 'none', color: 'var(--text-muted)',
+            fontSize: '1.2rem', cursor: 'pointer', padding: '4px'
+          }}
+          aria-label="Close menu"
+        >
+          <span>✕</span>
+        </button>
       </div>
 
       <nav className="sidebar-nav">
